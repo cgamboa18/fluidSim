@@ -8,14 +8,16 @@
 #include<SFML\System.hpp>
 
 #include "Physics.h"
-#include "ConfigReader.h"
-ConfigAttributes mainConfig = ConfigAttributes();
-
+#include "Yaml.hpp"
 
 void updateParticles(sf::Time& elapsedTime, sf::RenderWindow& screen, Particle& testParticle, Bound& boundaries, Particle list[], int index, int numElements);
 
 int main()
 {
+    Yaml::Node root;
+    Yaml::Parse(root, "config.txt");
+    double particleFlowControl = root["particleFlowControl"].As<double>();
+    //---------------------------------------------------
 
     sf::RenderWindow window(sf::VideoMode(800, 800), "FluidSim", sf::Style::Close);
     sf::Clock clock;
@@ -34,7 +36,7 @@ int main()
         static bool lock_click; // Create a bool variable for locking the click.
 
         control++;
-        if (lock_click && control > 20)
+        if (lock_click && control > particleFlowControl)
         {
             control = 0;
             elements++;
@@ -81,15 +83,21 @@ int main()
 
 void updateParticles(sf::Time& elapsedTime, sf::RenderWindow& screen, Particle& testParticle, Bound& boundaries, Particle list[], int index, int numElements)
 {
-    sf::CircleShape particleDot(2.f);
-    sf::CircleShape gradient(0);//new
+    Yaml::Node root;//parse config
+    Yaml::Parse(root, "config.txt");
+    bool showCenter = root["showCenter"].As<bool>();
+    double gradDivisions = root["gradDivisions"].As<double>();
+    double particleDisplaySize = root["particleDisplaySize"].As<float>();
+    //---------------------------------
+
+    sf::CircleShape particleDot(particleDisplaySize);
+    sf::CircleShape gradient(0);
     particleDot.setFillColor(sf::Color::Color(0, 0, 255, 255));
 
     calculatePosition(testParticle, elapsedTime, boundaries, list, index, numElements);
 
     particleDot.setPosition(testParticle.xPos - 2, testParticle.yPos - 2);
     
-    double gradDivisions = 10;
     for (int gradLayer = 1; gradLayer <= gradDivisions; gradLayer++)
     {
         double gradRadius = (30 / gradDivisions) * gradLayer;
@@ -101,5 +109,8 @@ void updateParticles(sf::Time& elapsedTime, sf::RenderWindow& screen, Particle& 
         screen.draw(gradient);
     }
     
-    screen.draw(particleDot);
+    if (showCenter)
+    {
+        screen.draw(particleDot);
+    }
 }

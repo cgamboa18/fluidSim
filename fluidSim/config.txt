@@ -1,1 +1,11 @@
-influenceRadius = 30
+friction: 0.999
+lossMultiplier: -0.30
+gravityAcceleration: 9.81
+influenceRadius: 30
+
+particleFlowControl: 10
+
+showCenter: false
+gradDivisions: 1
+particleDisplaySize: 2.0
+

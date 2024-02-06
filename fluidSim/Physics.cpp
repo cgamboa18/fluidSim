@@ -8,16 +8,18 @@
 #include<SFML\System.hpp>
 
 #include "Physics.h"
-#include "ConfigReader.h"
-ConfigAttributes physicsConfig = ConfigAttributes();
-
-double friction = 0.999;
-double lossMultiplier = -0.30;
-double gravityAcceleration = 0.981;
-double influenceRadius = physicsConfig.influenceRadiusConfig;
+#include "Yaml.hpp"
 
 void calculatePosition(Particle& particle, sf::Time& elapsedTime, Bound& boundaries, Particle list[], int index, int numElements)
 {
+	Yaml::Node root;
+	Yaml::Parse(root, "config.txt");
+	double friction = root["friction"].As<double>();
+	double lossMultiplier = root["lossMultiplier"].As<double>();
+	double gravityAcceleration = root["gravityAcceleration"].As<double>();
+	double influenceRadius = root["influenceRadius"].As<double>();
+	//--------------------------------------------------
+
 	double secondsElapsed = elapsedTime.asSeconds();
 	double distanceTraveledY;
 	double distanceTraveledX;	
