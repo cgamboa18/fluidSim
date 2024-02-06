@@ -1,4 +1,4 @@
-#include<iostream> //this is a test
+#include<iostream>
 #include<random>
 
 #include<SFML\Graphics.hpp>
@@ -26,15 +26,19 @@ int main()
     int elements = 0;
     Particle particleList[maxElements];
 
+    int control = 0;
     while (window.isOpen())
     {
         sf::Event event;
 
         static bool lock_click; // Create a bool variable for locking the click.
-        if (lock_click)
+
+        control++;
+        if (lock_click && control > 20)
         {
+            control = 0;
             elements++;
-            particleList[elements - 1].setParticleAttributes(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y, rand() % 200 - 100, rand() % 200 - 100);
+            particleList[elements - 1].setParticleAttributes(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y, 0, 0);
         }
 
         while (window.pollEvent(event))
