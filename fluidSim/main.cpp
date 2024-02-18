@@ -10,21 +10,19 @@
 #include "Physics.h"
 #include "Yaml.hpp"
 
+ConfigurationData configMain = ConfigurationData();//parse config file for values
+
 void updateParticles(sf::Time& elapsedTime, sf::RenderWindow& screen, Particle& testParticle, Bound& boundaries, Particle list[], int index, int numElements);
 
 int main()
 {
-    Yaml::Node root;
-    Yaml::Parse(root, "config.txt");
-    double particleFlowControl = root["particleFlowControl"].As<double>();
-    //---------------------------------------------------
 
     sf::RenderWindow window(sf::VideoMode(800, 800), "FluidSim", sf::Style::Close);
     sf::Clock clock;
 
-    Bound b1 = Bound(0, 800, 0, 800);
+    Bound b1 = Bound(0, 800, 0, 800);//instatiates object to declare the boundaries
 
-    const int maxElements = 999;
+    const int maxElements = 999; //set maximum amount of particle that can be on screen
     int elements = 0;
     Particle particleList[maxElements];
 
@@ -36,11 +34,12 @@ int main()
         static bool lock_click; // Create a bool variable for locking the click.
 
         control++;
-        if (lock_click && control > particleFlowControl)
+        if (lock_click && control > configMain.particleFlowControl)
         {
             control = 0;
             elements++;
-            particleList[elements - 1].setParticleAttributes(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y, 0, 0);
+            //creates new particle on screen, sets attributes of particle
+            particleList[elements - 1].setParticleAttributes(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y, rand()%5-5, 0);
         }
 
         while (window.pollEvent(event))
@@ -48,10 +47,10 @@ int main()
             if (event.type == sf::Event::Closed)
                 window.close();
 
-            
-            if (event.type == sf::Event::MouseButtonPressed) //Mouse button Pressed
+            //detects the mouse button beign pressed
+            if (event.type == sf::Event::MouseButtonPressed)
             {
-                if (event.mouseButton.button == sf::Mouse::Left && lock_click != true) //specifies
+                if (event.mouseButton.button == sf::Mouse::Left && lock_click != true)
                 {
                     lock_click = true; 
                 }
@@ -73,7 +72,7 @@ int main()
 
         for (int i = 0; i < elements; i++)
         {
-            updateParticles(elapsed, window, particleList[i], b1, particleList, i, elements);
+            updateParticles(elapsed, window, particleList[i], b1, particleList, i, elements); //updates the position of the particles on screen
         }
         window.display();
     }
@@ -83,14 +82,8 @@ int main()
 
 void updateParticles(sf::Time& elapsedTime, sf::RenderWindow& screen, Particle& testParticle, Bound& boundaries, Particle list[], int index, int numElements)
 {
-    Yaml::Node root;//parse config
-    Yaml::Parse(root, "config.txt");
-    bool showCenter = root["showCenter"].As<bool>();
-    double gradDivisions = root["gradDivisions"].As<double>();
-    double particleDisplaySize = root["particleDisplaySize"].As<float>();
-    //---------------------------------
 
-    sf::CircleShape particleDot(particleDisplaySize);
+    sf::CircleShape particleDot(configMain.particleDisplaySize);
     sf::CircleShape gradient(0);
     particleDot.setFillColor(sf::Color::Color(0, 0, 255, 255));
 
@@ -98,18 +91,19 @@ void updateParticles(sf::Time& elapsedTime, sf::RenderWindow& screen, Particle& 
 
     particleDot.setPosition(testParticle.xPos - 2, testParticle.yPos - 2);
     
-    for (int gradLayer = 1; gradLayer <= gradDivisions; gradLayer++)
+    //creates visual gradient of the particle
+    for (int gradLayer = 1; gradLayer <= configMain.gradDivisions; gradLayer++)
     {
-        double gradRadius = (30 / gradDivisions) * gradLayer;
+        double gradRadius = (configMain.influenceRadius / configMain.gradDivisions) * gradLayer;
 
         gradient.setRadius(gradRadius);
         gradient.setPosition(testParticle.xPos - (gradRadius), testParticle.yPos - (gradRadius));
-        gradient.setFillColor(sf::Color::Color(0, 255, 0, 60 - (30 * (gradLayer / gradDivisions))));
+        gradient.setFillColor(sf::Color::Color(0, 255, 0, 60 - (configMain.influenceRadius * (gradLayer / configMain.gradDivisions))));
 
         screen.draw(gradient);
     }
     
-    if (showCenter)
+    if (configMain.showCenter)
     {
         screen.draw(particleDot);
     }
