@@ -2,9 +2,9 @@ friction: 0.999
 lossMultiplier: -0.3
 gravityAcceleration: 9.807
 influenceRadius: 30
-viscosityMultiplier: 125
+viscosityMultiplier: 90.5
 
-particleFlowControl: 0
+particleFlowControl: 5
 
 showCenter: false
 gradDivisions: 5

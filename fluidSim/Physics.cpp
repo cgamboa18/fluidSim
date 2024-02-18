@@ -36,7 +36,7 @@ void calculatePosition(Particle& particle, sf::Time& elapsedTime, Bound& boundar
 	else if (particle.yPos - configPhysics.influenceRadius/2 < boundaries.upper)
 	{
 		particle.yVelocity = particle.yVelocity * configPhysics.lossMultiplier;
-		particle.yPos -= distanceTraveledY;
+		particle.yPos -= distanceTraveledY * 1.25;
 
 		particle.xVelocity = particle.xVelocity * configPhysics.friction;
 

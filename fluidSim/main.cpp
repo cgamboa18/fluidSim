@@ -34,12 +34,19 @@ int main()
         static bool lock_click; // Create a bool variable for locking the click.
 
         control++;
-        if (lock_click && control > configMain.particleFlowControl)
+        if (lock_click && control > configMain.particleFlowControl && elements != 999)
         {
-            control = 0;
-            elements++;
-            //creates new particle on screen, sets attributes of particle
-            particleList[elements - 1].setParticleAttributes(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y, rand()%5-5, 0);
+            if (sf::Mouse::getPosition(window).y + configMain.influenceRadius / 1.75 < b1.lower && // Checks if cursor is in bounds to create a new particle
+                sf::Mouse::getPosition(window).y - configMain.influenceRadius / 1.75 > b1.upper &&
+                sf::Mouse::getPosition(window).x + configMain.influenceRadius / 1.75 < b1.right &&
+                sf::Mouse::getPosition(window).x - configMain.influenceRadius / 1.75 > b1.left)
+            {
+                control = 0;
+                elements++;
+
+                //creates new particle on screen, sets attributes of particle
+                particleList[elements - 1].setParticleAttributes(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y, rand() % 5 - 5, 0);
+            }
         }
 
         while (window.pollEvent(event))
